@@ -1,8 +1,9 @@
 import { useState, useRef } from 'react'
 import { getLogo, saveLogo, removeLogo } from '../utils/storage'
+import bundledLogo from '../assets/ryc-logo.png'
 
 export default function Settings() {
-  const [logo, setLogo]     = useState(getLogo)
+  const [logo, setLogo]     = useState(() => getLogo() || bundledLogo)
   const [saved, setSaved]   = useState(false)
   const fileRef             = useRef()
 
@@ -40,9 +41,11 @@ export default function Settings() {
               <button onClick={() => fileRef.current.click()} className="px-4 py-2 text-sm border border-gray-300 rounded-lg text-gray-600">
                 Replace
               </button>
-              <button onClick={handleRemoveLogo} className="px-4 py-2 text-sm border border-red-200 rounded-lg text-red-500">
-                Remove
-              </button>
+              {getLogo() && (
+                <button onClick={() => { removeLogo(); setLogo(bundledLogo) }} className="px-4 py-2 text-sm border border-red-200 rounded-lg text-red-500">
+                  Reset to Default
+                </button>
+              )}
             </div>
           </div>
         ) : (
