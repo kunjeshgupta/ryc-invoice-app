@@ -1,44 +1,52 @@
-const KEYS = {
+const K = {
   invoices: 'ryc_invoices',
   counter:  'ryc_counter',
   logo:     'ryc_logo',
+  clients:  'ryc_clients',
 }
 
+// ── Invoices ─────────────────────────────────────────────────
 export function getInvoices() {
-  try { return JSON.parse(localStorage.getItem(KEYS.invoices) || '[]') }
+  try { return JSON.parse(localStorage.getItem(K.invoices) || '[]') }
   catch { return [] }
 }
-
 export function saveInvoice(invoice) {
   const list = getInvoices().filter(i => i.id !== invoice.id)
   list.unshift(invoice)
-  localStorage.setItem(KEYS.invoices, JSON.stringify(list))
+  localStorage.setItem(K.invoices, JSON.stringify(list))
 }
-
 export function deleteInvoice(id) {
-  const list = getInvoices().filter(i => i.id !== id)
-  localStorage.setItem(KEYS.invoices, JSON.stringify(list))
+  localStorage.setItem(K.invoices, JSON.stringify(getInvoices().filter(i => i.id !== id)))
 }
 
+// ── Invoice counter ───────────────────────────────────────────
 export function getNextInvoiceNo() {
-  const current = parseInt(localStorage.getItem(KEYS.counter) || '3', 10)
-  return current + 1
+  return parseInt(localStorage.getItem(K.counter) || '3', 10) + 1
 }
-
 export function bumpCounter(no) {
   const n = parseInt(no, 10)
-  const stored = parseInt(localStorage.getItem(KEYS.counter) || '0', 10)
-  if (n > stored) localStorage.setItem(KEYS.counter, String(n))
+  if (n > parseInt(localStorage.getItem(K.counter) || '0', 10))
+    localStorage.setItem(K.counter, String(n))
 }
 
-export function getLogo() {
-  return localStorage.getItem(KEYS.logo) || null
-}
+// ── Logo ──────────────────────────────────────────────────────
+export function getLogo()         { return localStorage.getItem(K.logo) || null }
+export function saveLogo(b64)     { localStorage.setItem(K.logo, b64) }
+export function removeLogo()      { localStorage.removeItem(K.logo) }
 
-export function saveLogo(base64) {
-  localStorage.setItem(KEYS.logo, base64)
+// ── Saved clients ─────────────────────────────────────────────
+export function getClients() {
+  try { return JSON.parse(localStorage.getItem(K.clients) || '[]') }
+  catch { return [] }
 }
-
-export function removeLogo() {
-  localStorage.removeItem(KEYS.logo)
+export function saveClient(client) {
+  // key by GSTIN (or name if no GSTIN)
+  const key = client.gstin || client.name
+  const list = getClients().filter(c => (c.gstin || c.name) !== key)
+  list.unshift(client)
+  localStorage.setItem(K.clients, JSON.stringify(list))
+}
+export function deleteClient(key) {
+  const list = getClients().filter(c => (c.gstin || c.name) !== key)
+  localStorage.setItem(K.clients, JSON.stringify(list))
 }
